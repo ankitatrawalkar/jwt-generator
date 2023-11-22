@@ -8,7 +8,7 @@ import in.ankitatrawalkar.utils.PEMUtils;
 import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Calendar;
+import java.util.*;
 
 public class JwtBuilder {
 
@@ -19,7 +19,16 @@ public class JwtBuilder {
             Algorithm algorithm = Algorithm.RSA256(pubRSA, privRSA);
             Calendar currentDate = Calendar.getInstance();
             currentDate.add(Calendar.YEAR, 10);
-            String token = JWT.create().withIssuer("example.com").withExpiresAt(currentDate.getTime()).sign(algorithm);
+            Map<String, Object> headerClaims = new HashMap<>();
+            // Custom header claim
+            headerClaims.put("customHeaderClaim1", "xxxx-xxxx-xxxx-xxxx");
+            String token = JWT.create().withIssuer("idp:xxxx-xxxx")
+                    .withSubject("resource-server:xxxx-xxxx")
+                    .withAudience("https://example.com")
+                    .withIssuedAt(new Date())
+                    .withJWTId(UUID.randomUUID().toString())
+                    .withHeader(headerClaims)
+                    .withExpiresAt(currentDate.getTime()).sign(algorithm);
             System.out.println("Token: " + token);
         } catch (JWTCreationException | IOException exception){
             // Invalid Signing configuration / Couldn't convert Claims.
